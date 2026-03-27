@@ -553,7 +553,7 @@ footer strong { color: var(--white); }
         <div class="gender-label">FEMALE</div>
       </div>
     </div>
-    <button class="next-btn" style="margin-top:1.25rem" onclick="goToStats()">NEXT →</button>
+
   </div>
 </section>
 
@@ -827,6 +827,7 @@ function selectGender(g) {
   root.style.setProperty('--accent', g==='male' ? 'var(--accent-m)' : 'var(--accent-f)');
   root.style.setProperty('--accent-glow', g==='male' ? 'var(--accent-m-glow)' : 'var(--accent-f-glow)');
   liveRecalc();
+  setTimeout(() => scrollToPanel(2), 400);
 }
 
 function goToStats() {
