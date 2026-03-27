@@ -48,7 +48,8 @@ body {
   background: var(--accent);
   width: 0%;
   z-index: 1000;
-  transition: width 0.4s var(--ease), background 0.4s var(--ease);
+  opacity: 0;
+  transition: width 0.4s var(--ease), background 0.4s var(--ease), opacity 0.4s var(--ease);
 }
 
 /* ── STEP DOTS ── */
@@ -522,7 +523,7 @@ footer strong { color: var(--white); }
 
 <!-- ── PANEL 0: HERO ── -->
 <section class="panel hero-panel" id="panel-0">
-  <div class="hero-badge">🇮🇪 <span>Ireland's Best</span> TDEE Calculator</div>
+  <div class="hero-badge"><span>Free</span> · No sign-up · Takes 60 seconds</div>
   <h1 class="hero-title">KNOW YOUR<br><span class="grad">CALORIES.</span></h1>
   <p class="hero-sub">Find your Total Daily Energy Expenditure in 60 seconds — with science-backed numbers, exact macros, and zero fluff.</p>
   <button class="hero-cta" onclick="scrollToPanel(1)">
@@ -800,6 +801,7 @@ const scrollObs = new IntersectionObserver(entries => {
       d.classList.toggle('done', di < i);
     });
     pb.style.width = ((i / (panels.length - 1)) * 100) + '%';
+    pb.style.opacity = i === 0 ? '0' : '1';
     // Animate inner content
     const inner = document.getElementById('inner-' + i);
     if (inner) setTimeout(() => inner.classList.add('in'), 80);
