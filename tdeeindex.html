@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TDEE Calculator Ireland | Find Your Daily Calories</title>
+<meta name="description" content="The most accurate TDEE calculator in Ireland. Find your Total Daily Energy Expenditure, set your macros and crush your goals.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #000;
+  --white: #f0f0f0;
+  --gray: #111;
+  --gray2: #222;
+  --gray3: #777;
+  --accent-m: #4f9eff;
+  --accent-m-glow: rgba(79,158,255,0.22);
+  --accent-f: #ff5dac;
+  --accent-f-glow: rgba(255,93,172,0.22);
+  --accent: var(--accent-m);
+  --accent-glow: var(--accent-m-glow);
+  --cut: #f97316;
+  --bulk: #22c55e;
+  --maintain: #a78bfa;
+  --font-d: 'Barlow Condensed', sans-serif;
+  --font-b: 'Manrope', sans-serif;
+  --ease: cubic-bezier(0.4,0,0.2,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-b);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-m), var(--accent-f));
+  width: 0%;
+  z-index: 1000;
+  transition: width 0.4s var(--ease);
+}
+
+/* ── STEP DOTS ── */
+.step-dots {
+  position: fixed;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+}
+.step-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gray2);
+  transition: all 0.3s var(--ease);
+  cursor: pointer;
+}
+.step-dot.active {
+  background: var(--white);
+  transform: scale(1.5);
+}
+.step-dot.done {
+  background: var(--accent);
+}
+
+/* ── GRAIN ── */
+.grain {
+  position: fixed; inset: 0; opacity: 0.025; pointer-events: none; z-index: 999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+/* ── PANELS ── */
+.panel {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── HERO PANEL ── */
+.hero-panel {
+  background: var(--bg);
+  text-align: center;
+}
+.hero-panel::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(79,158,255,0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, rgba(255,93,172,0.08) 0%, transparent 60%);
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border: 1px solid var(--gray2); border-radius: 100px;
+  padding: 0.35rem 1rem; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray3);
+  margin-bottom: 1.75rem;
+  opacity: 0; animation: slideUp 0.7s 0.1s var(--ease) forwards;
+}
+.hero-badge span { color: var(--white); }
+
+.hero-title {
+  font-family: var(--font-d);
+  font-size: clamp(5rem, 22vw, 12rem);
+  line-height: 0.85;
+  letter-spacing: 0.01em;
+  opacity: 0; animation: slideUp 0.7s 0.25s var(--ease) forwards;
+}
+.hero-title .grad {
+  background: linear-gradient(90deg, var(--accent-m), var(--accent-f));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.hero-sub {
+  margin-top: 1.5rem;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  color: var(--gray3); max-width: 380px; line-height: 1.7;
+  opacity: 0; animation: slideUp 0.7s 0.4s var(--ease) forwards;
+}
+
+.hero-cta {
+  margin-top: 2.5rem;
+  opacity: 0; animation: slideUp 0.7s 0.55s var(--ease) forwards;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  cursor: pointer; background: none; border: none; color: var(--gray3);
+  font-family: var(--font-b); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero-cta-arrow {
+  width: 44px; height: 44px;
+  border: 1.5px solid var(--gray2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  animation: pulse-ring 2.5s ease-in-out infinite;
+}
+.hero-cta-arrow svg { animation: bounceY 2s ease-in-out infinite; }
+
+@keyframes pulse-ring {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.08); }
+  50% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+}
+@keyframes bounceY {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* ── STEP PANEL BASE ── */
+.step-panel {
+  background: var(--bg);
+  gap: 0;
+}
+
+.step-panel-inner {
+  width: 100%; max-width: 520px;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.step-panel-inner.in {
+  opacity: 1; transform: translateY(0);
+}
+
+.step-eyebrow {
+  font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--gray3); font-weight: 600; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.step-eyebrow-line { flex: 1; height: 1px; background: var(--gray2); }
+
+.step-headline {
+  font-family: var(--font-d);
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  line-height: 0.9; letter-spacing: 0.02em;
+  margin-bottom: 1.75rem;
+}
+.step-headline .acc { color: var(--accent); }
+
+/* ── GENDER CARDS ── */
+.gender-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
+
+.gender-card {
+  border: 1.5px solid #333;
+  border-radius: 18px;
+  padding: 2rem 1rem 1.75rem;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+  background: #0a0a0a;
+  color: #555;
+  position: relative; overflow: hidden;
+}
+.gender-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  border-radius: inherit;
+}
+.gender-card.m::before { background: radial-gradient(ellipse at 50% 120%, rgba(79,158,255,0.18), transparent 70%); }
+.gender-card.f::before { background: radial-gradient(ellipse at 50% 120%, rgba(255,93,172,0.18), transparent 70%); }
+
+.gender-card:hover { border-color: #555; color: #999; }
+.gender-card.selected-m { border-color: var(--accent-m); color: var(--accent-m); box-shadow: 0 0 0 2px var(--accent-m), 0 0 40px rgba(79,158,255,0.15); }
+.gender-card.selected-m::before { opacity: 1; }
+.gender-card.selected-f { border-color: var(--accent-f); color: var(--accent-f); box-shadow: 0 0 0 2px var(--accent-f), 0 0 40px rgba(255,93,172,0.15); }
+.gender-card.selected-f::before { opacity: 1; }
+
+.gender-symbol { font-size: 3rem; line-height: 1; transition: transform 0.3s var(--ease); }
+.gender-card.selected-m .gender-symbol,
+.gender-card.selected-f .gender-symbol { transform: scale(1.1); }
+.gender-label { font-family: var(--font-d); font-size: 2rem; letter-spacing: 0.08em; }
+
+/* ── UNIT TOGGLE ── */
+.unit-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.unit-toggle {
+  display: flex; background: #0a0a0a; border: 1px solid var(--gray2);
+  border-radius: 8px; overflow: hidden; width: fit-content;
+}
+.unit-btn {
+  padding: 0.4rem 1.1rem; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; border: none;
+  background: transparent; color: var(--gray3); cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-b);
+}
+.unit-btn.active { background: var(--accent); color: #000; border-radius: 6px; }
+
+/* ── INPUTS ── */
+.fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
+.field-full { grid-column: 1 / -1; }
+
+.field { display: flex; flex-direction: column; gap: 0.45rem; }
+.field-label { font-size: 0.68rem; font-weight: 700; color: var(--gray3); letter-spacing: 0.06em; text-transform: uppercase; }
+.field-wrap { position: relative; }
+
+.field-input {
+  width: 100%; background: #0a0a0a; border: 1.5px solid var(--gray2);
+  border-radius: 12px; padding: 1rem 3rem 1rem 1.1rem;
+  color: var(--white); font-family: var(--font-b); font-size: 1.05rem; font-weight: 600;
+  outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+  -webkit-appearance: none; appearance: none;
+}
+.field-input::placeholder { color: #333; font-weight: 400; }
+.field-input:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field-unit {
+  position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+  font-size: 0.7rem; color: var(--gray3); pointer-events: none; font-weight: 700; letter-spacing: 0.04em;
+}
+
+/* BF upgrade hint */
+.bf-upgrade {
+  display: none; align-items: center; gap: 0.45rem;
+  margin-top: 0.5rem; font-size: 0.72rem; color: var(--bulk); font-weight: 600;
+}
+.bf-upgrade.show { display: flex; }
+.bf-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--bulk); animation: pdot 1.6s ease-in-out infinite; }
+
+/* ── ACTIVITY OPTIONS ── */
+.activity-list { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+
+.activity-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #0a0a0a; border: 1.5px solid #222;
+  border-radius: 14px; padding: 1rem 1.1rem;
+  cursor: pointer; transition: all 0.25s var(--ease);
+  position: relative; overflow: hidden;
+}
+.activity-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); opacity: 0; transition: opacity 0.25s;
+  border-radius: 3px 0 0 3px;
+}
+.activity-row:hover { border-color: #444; }
+.activity-row.selected { border-color: var(--accent); background: rgba(79,158,255,0.04); }
+.activity-row.selected::before { opacity: 1; }
+
+.activity-left { flex: 1; }
+.activity-name { font-weight: 700; font-size: 0.92rem; color: var(--white); }
+.activity-desc { font-size: 0.72rem; color: var(--gray3); margin-top: 0.15rem; }
+.activity-mult { font-family: var(--font-d); font-size: 1.4rem; color: var(--accent); min-width: 52px; text-align: right; letter-spacing: 0.02em; }
+
+/* ── NEXT BUTTON ── */
+.next-btn {
+  width: 100%; margin-top: 1.25rem;
+  padding: 1.1rem; background: var(--accent); border: none;
+  border-radius: 14px; font-family: var(--font-d); font-size: 1.4rem;
+  letter-spacing: 0.06em; color: #000; cursor: pointer;
+  transition: all 0.25s var(--ease); position: relative; overflow: hidden;
+}
+.next-btn::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.1); opacity:0; transition:opacity 0.2s; }
+.next-btn:hover::after { opacity:1; }
+.next-btn:active { transform: scale(0.98); }
+
+/* ── RESULTS PANEL ── */
+.results-panel {
+  background: var(--bg);
+  min-height: 100svh;
+  display: none;
+  flex-direction: column;
+  padding: 3rem 1.5rem 4rem;
+}
+.results-panel.show { display: flex; }
+
+.results-inner { max-width: 520px; margin: 0 auto; width: 100%; }
+
+/* Big TDEE reveal */
+.tdee-reveal {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: #0a0a0a;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 80px var(--accent-glow);
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  position: relative; overflow: hidden;
+}
+.tdee-reveal::before {
+  content: 'TDEE';
+  position: absolute; font-family: var(--font-d); font-size: 11rem;
+  opacity: 0.03; top: -2rem; right: -2rem; pointer-events: none; color: var(--accent);
+}
+.tdee-eyebrow { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gray3); font-weight: 600; margin-bottom: 0.5rem; }
+.tdee-num {
+  font-family: var(--font-d); font-size: clamp(4.5rem, 20vw, 7rem);
+  line-height: 1; color: var(--accent); letter-spacing: 0.02em;
+}
+.tdee-sub { font-size: 0.82rem; color: var(--gray3); margin-top: 0.4rem; }
+.formula-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 1rem; border: 1px solid var(--gray2); border-radius: 100px;
+  padding: 0.28rem 0.85rem; font-size: 0.68rem; font-weight: 600; color: var(--gray3);
+  background: rgba(255,255,255,0.03);
+}
+.formula-pill .fp-name { color: var(--accent); }
+.formula-pill .fp-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gray3); transition: background 0.3s; }
+.formula-pill.upgraded .fp-dot { background: var(--bulk); animation: pdot 1.6s ease-in-out infinite; }
+
+/* stats strip */
+.stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+.stat-box { background: #0a0a0a; border: 1px solid var(--gray2); border-radius: 14px; padding: 1rem 1.1rem; text-align: center; }
+.stat-box-label { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray3); font-weight: 600; margin-bottom: 0.35rem; }
+.stat-box-val { font-family: var(--font-d); font-size: 1.7rem; color: var(--white); }
+.stat-box-val.formula-val { font-size: 0.95rem; line-height: 1.3; padding-top: 0.25rem; color: var(--accent); }
+.stat-box-sub { font-size: 0.68rem; color: var(--gray3); margin-top: 0.15rem; }
+
+/* GOAL SELECTOR */
+.goal-label-row { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gray3); font-weight: 600; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.6rem; }
+.goal-label-row .gl-line { flex: 1; height: 1px; background: var(--gray2); }
+
+.goal-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+.goal-card {
+  background: #0a0a0a; border: 1.5px solid var(--gray2);
+  border-radius: 14px; padding: 1rem 0.4rem;
+  cursor: pointer; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  transition: all 0.25s var(--ease);
+}
+.goal-card:hover { border-color: #444; transform: translateY(-2px); }
+.goal-icon { font-size: 1.5rem; }
+.goal-name { font-family: var(--font-d); font-size: 1rem; letter-spacing: 0.05em; }
+.goal-delta { font-size: 0.64rem; color: var(--gray3); font-weight: 500; }
+.goal-card.active-cut { border-color: var(--cut); background: rgba(249,115,22,0.07); box-shadow: 0 0 0 1px var(--cut); }
+.goal-card.active-cut .goal-name { color: var(--cut); }
+.goal-card.active-maintain { border-color: var(--maintain); background: rgba(167,139,250,0.07); box-shadow: 0 0 0 1px var(--maintain); }
+.goal-card.active-maintain .goal-name { color: var(--maintain); }
+.goal-card.active-bulk { border-color: var(--bulk); background: rgba(34,197,94,0.07); box-shadow: 0 0 0 1px var(--bulk); }
+.goal-card.active-bulk .goal-name { color: var(--bulk); }
+
+/* Adjusted cals */
+.adj-box {
+  background: #0a0a0a; border: 1px solid var(--gray2);
+  border-radius: 16px; padding: 1.25rem 1.25rem;
+  text-align: center; margin-bottom: 1rem;
+  display: none;
+  animation: slideUp 0.4s var(--ease) forwards;
+}
+.adj-box.show { display: block; }
+.adj-eyebrow { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray3); font-weight: 600; margin-bottom: 0.3rem; }
+.adj-num { font-family: var(--font-d); font-size: clamp(2.8rem, 13vw, 4rem); letter-spacing: 0.02em; }
+.adj-note { font-size: 0.77rem; color: var(--gray3); margin-top: 0.4rem; line-height: 1.55; }
+
+/* MACROS */
+.macros-header { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gray3); font-weight: 600; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.6rem; }
+.macros-header .mh-line { flex:1; height:1px; background: var(--gray2); }
+.macro-list { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2rem; }
+
+.macro-card {
+  background: #0a0a0a; border: 1px solid var(--gray2);
+  border-radius: 16px; padding: 1.1rem 1.1rem 1.25rem;
+  transition: border-color 0.2s;
+}
+.macro-card:hover { border-color: #444; }
+.macro-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; }
+.macro-card-name { font-weight: 700; font-size: 0.88rem; }
+.macro-tag { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 100px; font-weight: 700; }
+.tag-s { background: rgba(79,158,255,0.15); color: #60a5fa; }
+.tag-h { background: rgba(34,197,94,0.15); color: var(--bulk); }
+.tag-k { background: rgba(249,115,22,0.15); color: var(--cut); }
+
+/* Donuts */
+.donut-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.4rem; }
+.donut-wrap-outer { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.donut-svg-wrap { position: relative; width: 88px; height: 88px; }
+.d-svg { width: 88px; height: 88px; transform: rotate(-90deg); }
+.d-track { fill:none; stroke: var(--gray2); stroke-width:7; }
+.d-fill { fill:none; stroke-width:7; stroke-linecap:round; transition: stroke-dashoffset 1.1s cubic-bezier(0.4,0,0.2,1); }
+.donut-mid {
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%); text-align:center; line-height:1.15;
+}
+.donut-g { font-family: var(--font-d); font-size: 1.1rem; color: var(--white); }
+.donut-pct { font-size: 0.62rem; color: var(--gray3); font-weight: 600; }
+.donut-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.dl-p { color: #60a5fa; } .dl-c { color: #fbbf24; } .dl-f { color: #f472b6; }
+
+/* ── EDUCATION ── */
+.edu-panel {
+  background: #0a0a0a;
+  border-top: 1px solid var(--gray2);
+  padding: 5rem 1.5rem 6rem;
+}
+.edu-inner { max-width: 520px; margin: 0 auto; }
+.edu-headline {
+  font-family: var(--font-d); font-size: clamp(2.8rem, 11vw, 5rem);
+  line-height: 0.88; letter-spacing: 0.02em; margin-bottom: 3.5rem;
+}
+.edu-headline .grad {
+  background: linear-gradient(90deg, var(--accent-m), var(--accent-f));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.edu-items { display: flex; flex-direction: column; }
+.edu-item {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--gray2);
+  cursor: default;
+  transition: padding 0.3s var(--ease);
+}
+.edu-item:last-child { border-bottom: none; }
+.edu-item-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+.edu-item-title { font-family: var(--font-d); font-size: 1.6rem; letter-spacing: 0.04em; }
+.edu-item-num { font-family: var(--font-d); font-size: 1rem; color: var(--gray3); flex-shrink: 0; }
+.edu-item-body {
+  font-size: 0.87rem; line-height: 1.78; color: var(--gray3);
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.45s var(--ease), margin-top 0.3s;
+}
+.edu-item-body.open { max-height: 400px; margin-top: 0.85rem; }
+.edu-item-body strong { color: var(--white); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bg); border-top: 1px solid var(--gray2);
+  padding: 2rem 1.5rem; text-align: center;
+  font-size: 0.7rem; color: var(--gray3);
+}
+footer strong { color: var(--white); }
+
+/* ── INLINE ALERT ── */
+.inline-alert {
+  background: #111; border: 1px solid var(--cut);
+  border-radius: 12px; padding: 0.75rem 1rem;
+  font-size: 0.82rem; color: var(--cut); font-weight: 600;
+  margin-bottom: 1rem; text-align: center;
+  animation: slideUp 0.3s var(--ease);
+}
+
+/* ── KEYFRAMES ── */
+@keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(0.6)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.pop-anim { animation: pop 0.3s var(--ease); }
+
+/* ── RESPONSIVE ── */
+@media (max-width:380px) {
+  .fields-grid { grid-template-columns: 1fr; }
+  .donut-svg-wrap { width:76px; height:76px; }
+  .d-svg { width:76px; height:76px; }
+}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="progress-bar" id="progress-bar"></div>
+
+<!-- STEP DOTS -->
+<div class="step-dots" id="step-dots">
+  <div class="step-dot active" onclick="scrollToPanel(0)"></div>
+  <div class="step-dot" onclick="scrollToPanel(1)"></div>
+  <div class="step-dot" onclick="scrollToPanel(2)"></div>
+  <div class="step-dot" onclick="scrollToPanel(3)"></div>
+  <div class="step-dot" onclick="scrollToPanel(4)"></div>
+</div>
+
+<!-- ── PANEL 0: HERO ── -->
+<section class="panel hero-panel" id="panel-0">
+  <div class="hero-badge">🇮🇪 <span>Ireland's Best</span> TDEE Calculator</div>
+  <h1 class="hero-title">KNOW YOUR<br><span class="grad">CALORIES.</span></h1>
+  <p class="hero-sub">Find your Total Daily Energy Expenditure in 60 seconds — with science-backed numbers, exact macros, and zero fluff.</p>
+  <button class="hero-cta" onclick="scrollToPanel(1)">
+    <div class="hero-cta-arrow">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 2v10M2 7l5 5 5-5" stroke="#777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    START
+  </button>
+</section>
+
+<!-- ── PANEL 1: GENDER ── -->
+<section class="panel step-panel" id="panel-1">
+  <div class="step-panel-inner" id="inner-1">
+    <div class="step-eyebrow">
+      <span>Step 01</span>
+      <div class="step-eyebrow-line"></div>
+    </div>
+    <div class="step-headline">WHO<br>ARE <span class="acc">YOU?</span></div>
+    <div class="gender-grid">
+      <div class="gender-card m" id="btn-male" onclick="selectGender('male')">
+        <div class="gender-symbol">♂</div>
+        <div class="gender-label">MALE</div>
+      </div>
+      <div class="gender-card f" id="btn-female" onclick="selectGender('female')">
+        <div class="gender-symbol">♀</div>
+        <div class="gender-label">FEMALE</div>
+      </div>
+    </div>
+    <button class="next-btn" style="margin-top:1.25rem" onclick="goToStats()">NEXT →</button>
+  </div>
+</section>
+
+<!-- ── PANEL 2: STATS ── -->
+<section class="panel step-panel" id="panel-2">
+  <div class="step-panel-inner" id="inner-2">
+    <div class="step-eyebrow">
+      <span>Step 02</span>
+      <div class="step-eyebrow-line"></div>
+    </div>
+    <div class="step-headline">YOUR<br><span class="acc">STATS.</span></div>
+
+    <div class="unit-row">
+      <div class="unit-toggle">
+        <button class="unit-btn active" onclick="setUnit('metric',event)">Metric</button>
+        <button class="unit-btn" onclick="setUnit('imperial',event)">Imperial</button>
+      </div>
+    </div>
+
+    <div class="fields-grid">
+      <div class="field">
+        <div class="field-label">Age</div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="age" placeholder="25" min="15" max="80" oninput="liveRecalc()">
+          <span class="field-unit">yrs</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Weight</div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="weight" placeholder="75" min="30" max="300" oninput="liveRecalc()">
+          <span class="field-unit" id="weight-unit">kg</span>
+        </div>
+      </div>
+
+      <!-- METRIC -->
+      <div class="field field-full" id="height-metric">
+        <div class="field-label">Height</div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="height-cm" placeholder="175" min="100" max="250" oninput="liveRecalc()">
+          <span class="field-unit">cm</span>
+        </div>
+      </div>
+
+      <!-- IMPERIAL -->
+      <div class="field" id="height-ft-wrap" style="display:none">
+        <div class="field-label">Feet</div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="height-ft" placeholder="5" min="3" max="8" oninput="liveRecalc()">
+          <span class="field-unit">ft</span>
+        </div>
+      </div>
+      <div class="field" id="height-in-wrap" style="display:none">
+        <div class="field-label">Inches</div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="height-in" placeholder="10" min="0" max="11" oninput="liveRecalc()">
+          <span class="field-unit">in</span>
+        </div>
+      </div>
+
+      <div class="field field-full">
+        <div class="field-label">Body Fat % <span style="color:var(--gray3);font-weight:400;text-transform:none;letter-spacing:0">(optional — upgrades accuracy)</span></div>
+        <div class="field-wrap">
+          <input class="field-input" type="number" id="bodyfat" placeholder="Leave blank if unsure" min="3" max="60" oninput="liveRecalc()">
+          <span class="field-unit">%</span>
+        </div>
+        <div class="bf-upgrade" id="bf-hint">
+          <span class="bf-dot"></span>
+          Upgraded to Katch-McArdle!
+        </div>
+      </div>
+    </div>
+
+    <button class="next-btn" onclick="goToActivity()">NEXT →</button>
+  </div>
+</section>
+
+<!-- ── PANEL 3: ACTIVITY ── -->
+<section class="panel step-panel" id="panel-3">
+  <div class="step-panel-inner" id="inner-3">
+    <div class="step-eyebrow">
+      <span>Step 03</span>
+      <div class="step-eyebrow-line"></div>
+    </div>
+    <div class="step-headline">HOW<br><span class="acc">ACTIVE?</span></div>
+
+    <div class="activity-list">
+      <div class="activity-row" onclick="selectActivity(this,1.2)">
+        <div class="activity-left">
+          <div class="activity-name">Sedentary</div>
+          <div class="activity-desc">Desk job, little to no exercise</div>
+        </div>
+        <div class="activity-mult">×1.2</div>
+      </div>
+      <div class="activity-row" onclick="selectActivity(this,1.375)">
+        <div class="activity-left">
+          <div class="activity-name">Lightly Active</div>
+          <div class="activity-desc">1–2 workouts per week</div>
+        </div>
+        <div class="activity-mult">×1.375</div>
+      </div>
+      <div class="activity-row" onclick="selectActivity(this,1.55)">
+        <div class="activity-left">
+          <div class="activity-name">Moderately Active</div>
+          <div class="activity-desc">3–5 workouts per week</div>
+        </div>
+        <div class="activity-mult">×1.55</div>
+      </div>
+      <div class="activity-row" onclick="selectActivity(this,1.725)">
+        <div class="activity-left">
+          <div class="activity-name">Very Active</div>
+          <div class="activity-desc">Hard training 6–7 days/week</div>
+        </div>
+        <div class="activity-mult">×1.725</div>
+      </div>
+      <div class="activity-row" onclick="selectActivity(this,1.9)">
+        <div class="activity-left">
+          <div class="activity-name">Athlete</div>
+          <div class="activity-desc">Twice-daily or physical job</div>
+        </div>
+        <div class="activity-mult">×1.9</div>
+      </div>
+    </div>
+
+    <button class="next-btn" onclick="calculate()">CALCULATE MY TDEE →</button>
+  </div>
+</section>
+
+<!-- ── PANEL 4: RESULTS ── -->
+<section class="panel step-panel results-panel" id="panel-4">
+  <div class="results-inner">
+
+    <div class="tdee-reveal">
+      <div class="tdee-eyebrow">Your Daily Calories — TDEE</div>
+      <div class="tdee-num" id="tdee-value">—</div>
+      <div class="tdee-sub">calories per day to maintain your weight</div>
+      <div class="formula-pill" id="formula-pill">
+        <span class="fp-dot"></span>
+        Formula: <span class="fp-name" id="fp-name">—</span>
+        &nbsp;·&nbsp; <span id="fp-note">—</span>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-box">
+        <div class="stat-box-label">BMR (at rest)</div>
+        <div class="stat-box-val" id="bmr-value">—</div>
+        <div class="stat-box-sub">kcal / day</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Formula Used</div>
+        <div class="stat-box-val formula-val" id="formula-box">—</div>
+        <div class="stat-box-sub" id="formula-box-note">—</div>
+      </div>
+    </div>
+
+    <div class="goal-label-row">
+      <div class="gl-line"></div>
+      <span>Pick Your Goal</span>
+      <div class="gl-line"></div>
+    </div>
+
+    <div class="goal-strip">
+      <div class="goal-card" id="goal-cut" onclick="selectGoal('cut',event)">
+        <div class="goal-icon">🔥</div>
+        <div class="goal-name" style="color:var(--cut)">CUT</div>
+        <div class="goal-delta">−500 kcal</div>
+      </div>
+      <div class="goal-card" id="goal-maintain" onclick="selectGoal('maintain',event)">
+        <div class="goal-icon">⚖️</div>
+        <div class="goal-name" style="color:var(--maintain)">MAINTAIN</div>
+        <div class="goal-delta">±0 kcal</div>
+      </div>
+      <div class="goal-card" id="goal-bulk" onclick="selectGoal('bulk',event)">
+        <div class="goal-icon">💪</div>
+        <div class="goal-name" style="color:var(--bulk)">BULK</div>
+        <div class="goal-delta">+300 kcal</div>
+      </div>
+    </div>
+
+    <div class="adj-box" id="adj-box">
+      <div class="adj-eyebrow" id="adj-label">—</div>
+      <div class="adj-num" id="adj-value">—</div>
+      <div class="adj-note" id="adj-note">—</div>
+    </div>
+
+    <div id="macros-wrap" style="display:none">
+      <div class="macros-header">
+        <div class="mh-line"></div>
+        <span>Macro Targets</span>
+        <div class="mh-line"></div>
+      </div>
+      <div class="macro-list" id="macro-list"></div>
+    </div>
+
+    <!-- Recalculate nudge -->
+    <div style="text-align:center;margin-top:1rem">
+      <button onclick="scrollToPanel(1)" style="background:none;border:1px solid var(--gray2);border-radius:10px;padding:0.65rem 1.25rem;color:var(--gray3);font-family:var(--font-b);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#555'" onmouseout="this.style.borderColor='var(--gray2)'">
+        ↺ &nbsp;Recalculate
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── EDUCATION ── -->
+<section class="edu-panel">
+  <div class="edu-inner">
+    <h2 class="edu-headline">THE SCIENCE<br><span class="grad">BEHIND IT.</span></h2>
+    <div class="edu-items" id="edu-items">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built in Ireland 🇮🇪 &nbsp;·&nbsp; <strong>Mifflin-St Jeor & Katch-McArdle</strong> &nbsp;·&nbsp; For informational purposes only.
+</footer>
+
+<script>
+// ── STATE ──
+const S = {
+  gender: null, unit: 'metric', activity: null,
+  tdee: 0, bmr: 0, goal: null, calculated: false,
+};
+
+// ── PANELS ──
+const panels = ['panel-0','panel-1','panel-2','panel-3','panel-4'];
+
+function scrollToPanel(i) {
+  document.getElementById(panels[i]).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Progress & dots on scroll
+const allPanels = panels.map(id => document.getElementById(id));
+const dots = document.querySelectorAll('.step-dot');
+const pb = document.getElementById('progress-bar');
+
+const scrollObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const i = allPanels.indexOf(e.target);
+    if (i < 0) return;
+    dots.forEach((d, di) => {
+      d.classList.toggle('active', di === i);
+      d.classList.toggle('done', di < i);
+    });
+    pb.style.width = ((i / (panels.length - 1)) * 100) + '%';
+    // Animate inner content
+    const inner = document.getElementById('inner-' + i);
+    if (inner) setTimeout(() => inner.classList.add('in'), 80);
+  });
+}, { threshold: 0.4 });
+
+allPanels.forEach(p => { if (p) scrollObs.observe(p); });
+
+// ── GENDER ──
+function selectGender(g) {
+  S.gender = g;
+  document.getElementById('btn-male').className = 'gender-card m' + (g==='male'?' selected-m':'');
+  document.getElementById('btn-female').className = 'gender-card f' + (g==='female'?' selected-f':'');
+  const root = document.documentElement;
+  root.style.setProperty('--accent', g==='male' ? 'var(--accent-m)' : 'var(--accent-f)');
+  root.style.setProperty('--accent-glow', g==='male' ? 'var(--accent-m-glow)' : 'var(--accent-f-glow)');
+  liveRecalc();
+}
+
+function goToStats() {
+  if (!S.gender) { showAlert('panel-1', 'Please select Male or Female first.'); return; }
+  scrollToPanel(2);
+}
+
+// ── UNIT ──
+function setUnit(u, evt) {
+  S.unit = u;
+  document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+  evt.target.classList.add('active');
+  document.getElementById('weight-unit').textContent = u==='metric' ? 'kg' : 'lbs';
+  const metric = document.getElementById('height-metric');
+  const ftw = document.getElementById('height-ft-wrap');
+  const inw = document.getElementById('height-in-wrap');
+  if (u==='metric') {
+    metric.style.display=''; ftw.style.display='none'; inw.style.display='none';
+    metric.className='field field-full';
+  } else {
+    metric.style.display='none'; ftw.style.display=''; inw.style.display='';
+    ftw.className='field'; inw.className='field';
+  }
+  liveRecalc();
+}
+
+// ── ACTIVITY ──
+function selectActivity(el, mult) {
+  document.querySelectorAll('.activity-row').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  S.activity = mult;
+  liveRecalc();
+}
+
+function goToActivity() {
+  const age = parseFloat(document.getElementById('age').value);
+  const w = parseFloat(document.getElementById('weight').value);
+  let h;
+  if (S.unit==='metric') {
+    h = parseFloat(document.getElementById('height-cm').value);
+  } else {
+    const ft = parseFloat(document.getElementById('height-ft').value)||0;
+    const inch = parseFloat(document.getElementById('height-in').value)||0;
+    h = (ft*12+inch)*2.54;
+  }
+  if (!age||!w||!h) { showAlert('panel-2','Please fill in age, weight and height.'); return; }
+  scrollToPanel(3);
+}
+
+// ── CALC ──
+function runCalc() {
+  const age = parseFloat(document.getElementById('age').value);
+  const wr = parseFloat(document.getElementById('weight').value);
+  const bf = parseFloat(document.getElementById('bodyfat').value);
+  const wkg = S.unit==='metric' ? wr : wr*0.453592;
+  let hcm;
+  if (S.unit==='metric') {
+    hcm = parseFloat(document.getElementById('height-cm').value);
+  } else {
+    const ft = parseFloat(document.getElementById('height-ft').value)||0;
+    const inch = parseFloat(document.getElementById('height-in').value)||0;
+    hcm = (ft*12+inch)*2.54;
+  }
+  if (!S.gender||!age||!wr||!hcm||!S.activity) return null;
+  const hasBF = !isNaN(bf)&&bf>3&&bf<60;
+  let bmr, formula, fNote;
+  if (hasBF) {
+    const lbm = wkg*(1-bf/100);
+    bmr = 370+(21.6*lbm);
+    formula='Katch-McArdle'; fNote='most accurate — uses lean mass';
+  } else {
+    bmr = S.gender==='male'
+      ? (10*wkg)+(6.25*hcm)-(5*age)+5
+      : (10*wkg)+(6.25*hcm)-(5*age)-161;
+    formula='Mifflin-St Jeor'; fNote='gold standard without BF%';
+  }
+  return { bmr:Math.round(bmr), tdee:Math.round(bmr*S.activity), formula, fNote, hasBF };
+}
+
+function applyResult(r) {
+  S.bmr=r.bmr; S.tdee=r.tdee;
+  animNum('tdee-value', r.tdee);
+  animNum('bmr-value', r.bmr);
+  document.getElementById('fp-name').textContent = r.formula;
+  document.getElementById('fp-note').textContent = r.fNote;
+  document.getElementById('formula-box').textContent = r.formula;
+  document.getElementById('formula-box-note').textContent = r.fNote;
+  document.getElementById('formula-pill').classList.toggle('upgraded', r.hasBF);
+  document.getElementById('bf-hint').classList.toggle('show', r.hasBF);
+  if (S.goal) refreshGoal(false);
+}
+
+function liveRecalc() {
+  if (!S.calculated) return;
+  const r = runCalc();
+  if (r) applyResult(r);
+}
+
+function calculate() {
+  if (!S.gender) { showAlert('panel-1','Please select your gender.'); scrollToPanel(1); return; }
+  if (!S.activity) { showAlert('panel-3','Please select your activity level.'); return; }
+  const r = runCalc();
+  if (!r) { showAlert('panel-2','Please fill in age, weight and height.'); scrollToPanel(2); return; }
+  S.calculated = true;
+  applyResult(r);
+  const rp = document.getElementById('panel-4');
+  rp.classList.add('show');
+  setTimeout(() => {
+    rp.scrollIntoView({ behavior:'smooth', block:'start' });
+    const inner = document.getElementById('inner-4');
+    if (inner) setTimeout(()=>inner.classList.add('in'),200);
+  }, 100);
+  if (!S.goal) {
+    document.getElementById('adj-box').classList.remove('show');
+    document.getElementById('macros-wrap').style.display='none';
+  }
+}
+
+// ── GOAL ──
+function selectGoal(g, evt) {
+  S.goal = g;
+  document.querySelectorAll('.goal-card').forEach(c=>c.className='goal-card');
+  const map = { cut:'active-cut', maintain:'active-maintain', bulk:'active-bulk' };
+  document.getElementById('goal-'+g).classList.add(map[g]);
+  if (evt) { const b=evt.currentTarget; b.classList.add('pop-anim'); setTimeout(()=>b.classList.remove('pop-anim'),300); }
+  refreshGoal(true);
+}
+
+function refreshGoal(scroll) {
+  const g = S.goal;
+  document.querySelectorAll('.goal-card').forEach(c=>c.className='goal-card');
+  const map={cut:'active-cut',maintain:'active-maintain',bulk:'active-bulk'};
+  document.getElementById('goal-'+g).classList.add(map[g]);
+  let cals,label,note,color;
+  if (g==='cut') { cals=S.tdee-500; label='Fat Loss Target'; note='~0.5 kg fat loss per week · Prioritise protein'; color='var(--cut)'; }
+  else if (g==='bulk') { cals=S.tdee+300; label='Lean Bulk Target'; note='Clean surplus · Minimise fat, maximise muscle'; color='var(--bulk)'; }
+  else { cals=S.tdee; label='Maintenance Calories'; note='Hold your weight · Perfect for recomp & performance'; color='var(--maintain)'; }
+  S.targetCals=cals;
+  document.getElementById('adj-label').textContent=label;
+  document.getElementById('adj-value').style.color=color;
+  document.getElementById('adj-note').textContent=note;
+  const ab=document.getElementById('adj-box'); ab.classList.add('show');
+  animNum('adj-value',cals);
+  renderMacros(cals,g);
+  document.getElementById('macros-wrap').style.display='block';
+  if (scroll) setTimeout(()=>document.getElementById('macros-wrap').scrollIntoView({behavior:'smooth',block:'nearest'}),150);
+}
+
+// ── MACROS ──
+const R=35, CIRC=2*Math.PI*R;
+function donut(label,g,pct,color,lc) {
+  const off = CIRC-(pct/100)*CIRC;
+  return `<div class="donut-wrap-outer">
+    <div class="donut-svg-wrap">
+      <svg class="d-svg" viewBox="0 0 90 90">
+        <circle class="d-track" cx="45" cy="45" r="${R}"/>
+        <circle class="d-fill" cx="45" cy="45" r="${R}" stroke="${color}"
+          stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${CIRC.toFixed(2)}"
+          data-t="${off.toFixed(2)}"/>
+      </svg>
+      <div class="donut-mid"><div class="donut-g">${g}g</div><div class="donut-pct">${pct}%</div></div>
+    </div>
+    <div class="donut-label ${lc}">${label}</div>
+  </div>`;
+}
+
+function renderMacros(cals,goal) {
+  const sets={
+    cut:[
+      {n:'High Protein Cut',tag:'Recommended',tc:'tag-h',p:.40,c:.35,f:.25},
+      {n:'Standard Deficit',tag:'Balanced',tc:'tag-s',p:.30,c:.40,f:.30},
+      {n:'Low Carb Cut',tag:'Lower Carb',tc:'tag-k',p:.40,c:.20,f:.40},
+    ],
+    bulk:[
+      {n:'Lean Bulk',tag:'Recommended',tc:'tag-h',p:.30,c:.50,f:.20},
+      {n:'Standard Bulk',tag:'Balanced',tc:'tag-s',p:.25,c:.50,f:.25},
+      {n:'High Protein Bulk',tag:'Max Muscle',tc:'tag-k',p:.35,c:.45,f:.20},
+    ],
+    maintain:[
+      {n:'Balanced Macros',tag:'Recommended',tc:'tag-s',p:.30,c:.40,f:.30},
+      {n:'High Protein Recomp',tag:'Recomp',tc:'tag-h',p:.40,c:.35,f:.25},
+      {n:'Athletic Performance',tag:'Sport',tc:'tag-k',p:.25,c:.55,f:.20},
+    ],
+  }[goal];
+  const container=document.getElementById('macro-list');
+  container.innerHTML='';
+  sets.forEach((pr,i)=>{
+    const pG=Math.round(cals*pr.p/4), cG=Math.round(cals*pr.c/4), fG=Math.round(cals*pr.f/9);
+    const pP=Math.round(pr.p*100), cP=Math.round(pr.c*100), fP=Math.round(pr.f*100);
+    const card=document.createElement('div');
+    card.className='macro-card';
+    card.innerHTML=`<div class="macro-card-top"><div class="macro-card-name">${pr.n}</div><div class="macro-tag ${pr.tc}">${pr.tag}</div></div>
+      <div class="donut-row">
+        ${donut('Protein',pG,pP,'#60a5fa','dl-p')}
+        ${donut('Carbs',cG,cP,'#fbbf24','dl-c')}
+        ${donut('Fat',fG,fP,'#f472b6','dl-f')}
+      </div>`;
+    container.appendChild(card);
+    setTimeout(()=>{
+      card.querySelectorAll('.d-fill').forEach(a=>{ a.style.strokeDashoffset=a.dataset.t; });
+    }, 100+i*80);
+  });
+}
+
+// ── EDUCATION (accordion) ──
+const eduData = [
+  { n:'01', title:'WHAT IS TDEE?', body:'<strong>Total Daily Energy Expenditure (TDEE)</strong> is the total calories your body burns in a day — resting metabolism, digestion, every step and every rep. It\'s the single most important number for body composition. Too many calories = fat gain. Too few = muscle loss. Hit it right = total control.' },
+  { n:'02', title:'WHAT IS BMR?', body:'Your <strong>Basal Metabolic Rate</strong> is the calories burned at complete rest. We use <strong>Mifflin-St Jeor</strong> — the gold standard without body fat data. If you add your BF%, we upgrade to <strong>Katch-McArdle</strong>, which works from lean mass directly and is even more accurate. You can update BF% anytime and results refresh instantly.' },
+  { n:'03', title:'CUTTING', body:'A <strong>−500 calorie deficit</strong> from TDEE produces ~0.5 kg of fat loss per week — sustainable and muscle-sparing. Going deeper risks hormonal disruption and rebound. <strong>High protein + consistent deficit + patience = results.</strong>' },
+  { n:'04', title:'MAINTAINING', body:'Eating at TDEE keeps weight stable while unlocking <strong>body recomposition</strong> — losing fat and building muscle simultaneously. It\'s also the foundation for athletic performance. A <strong>well-fuelled maintenance phase</strong> is massively underrated. Your body is a long-term investment, not a short-term project.' },
+  { n:'05', title:'BULKING', body:'A <strong>+250–500 calorie surplus</strong> above TDEE fuels lean muscle growth without excessive fat. Pair with progressive overload and <strong>1.6–2.2g protein per kg bodyweight</strong>. More food does not equal more muscle — the training stimulus is the trigger.' },
+  { n:'06', title:'MACROS', body:'<strong>Protein (4 kcal/g)</strong> — builds muscle, highest satiety. <strong>Carbohydrates (4 kcal/g)</strong> — primary fuel for training and brain. <strong>Fat (9 kcal/g)</strong> — hormones, joints, vitamins A/D/E/K. The right ratio for your goal is shown in the macro targets above.' },
+  { n:'07', title:'ACCURACY', body:'No calculator is 100% precise. But <strong>Mifflin-St Jeor and Katch-McArdle</strong> are the most validated formulas available. Use your result as a starting point, track for 2–3 weeks, adjust by ±100–150 kcal based on real progress. <strong>The number is a compass, not a cage.</strong>' },
+];
+
+const eduContainer = document.getElementById('edu-items');
+eduData.forEach((item, i) => {
+  const el = document.createElement('div');
+  el.className = 'edu-item';
+  el.innerHTML = `
+    <div class="edu-item-head" onclick="toggleEdu(${i})">
+      <div class="edu-item-title">${item.title}</div>
+      <div class="edu-item-num">${item.n}</div>
+    </div>
+    <div class="edu-item-body" id="edu-body-${i}">${item.body}</div>`;
+  eduContainer.appendChild(el);
+});
+
+function toggleEdu(i) {
+  const body = document.getElementById('edu-body-'+i);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.edu-item-body').forEach(b=>b.classList.remove('open'));
+  if (!isOpen) body.classList.add('open');
+}
+
+// ── UTILS ──
+function animNum(id, target) {
+  const el = document.getElementById(id);
+  const start = parseInt(el.textContent.replace(/[^0-9]/g,''))||0;
+  const t0=performance.now(), dur=750;
+  const run = now => {
+    const p=Math.min((now-t0)/dur,1), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(start+(target-start)*e).toLocaleString();
+    if(p<1) requestAnimationFrame(run);
+  };
+  requestAnimationFrame(run);
+}
+
+function showAlert(panelId, msg) {
+  const panel = document.getElementById(panelId);
+  const old = panel.querySelector('.inline-alert');
+  if (old) old.remove();
+  const a = document.createElement('div');
+  a.className = 'inline-alert';
+  a.textContent = '⚠ ' + msg;
+  panel.querySelector('.step-panel-inner')?.prepend(a) || panel.prepend(a);
+  setTimeout(()=>a.remove(), 3200);
+}
+
+function shake(el) {
+  el.style.animation='none'; void el.offsetWidth;
+  el.style.animation='shake 0.4s var(--ease)';
+}
+</script>
+</body>
+</html>
