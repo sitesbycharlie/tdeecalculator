@@ -45,10 +45,10 @@ body {
   position: fixed;
   top: 0; left: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-m), var(--accent-f));
+  background: var(--accent);
   width: 0%;
   z-index: 1000;
-  transition: width 0.4s var(--ease);
+  transition: width 0.4s var(--ease), background 0.4s var(--ease);
 }
 
 /* ── STEP DOTS ── */
@@ -61,6 +61,7 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   z-index: 100;
+  transition: opacity 0.5s ease;
 }
 .step-dot {
   width: 6px; height: 6px;
@@ -689,11 +690,9 @@ footer strong { color: var(--white); }
       <div class="tdee-eyebrow">Your Daily Calories — TDEE</div>
       <div class="tdee-num" id="tdee-value">—</div>
       <div class="tdee-sub">calories per day to maintain your weight</div>
-      <div class="formula-pill" id="formula-pill">
-        <span class="fp-dot"></span>
-        Formula: <span class="fp-name" id="fp-name">—</span>
-        &nbsp;·&nbsp; <span id="fp-note">—</span>
-      </div>
+      <span id="fp-name" style="display:none"></span>
+      <span id="fp-note" style="display:none"></span>
+      <div id="formula-pill" style="display:none"></div>
     </div>
 
     <div class="stats-strip">
@@ -769,7 +768,7 @@ footer strong { color: var(--white); }
 </section>
 
 <footer>
-  Built in Ireland 🇮🇪 &nbsp;·&nbsp; <strong>Mifflin-St Jeor & Katch-McArdle</strong> &nbsp;·&nbsp; For informational purposes only.
+  🇮🇪 &nbsp;Built by <a href="https://www.sitesbycharlie.ie" target="_blank" style="color:var(--white);font-weight:700;text-decoration:none;border-bottom:1px solid var(--gray2)">SitesByCharlie</a> &nbsp;·&nbsp; For informational purposes only. For specific calorie and macro targets, consult a qualified nutrition professional.
 </footer>
 
 <script>
@@ -808,6 +807,16 @@ const scrollObs = new IntersectionObserver(entries => {
 }, { threshold: 0.4 });
 
 allPanels.forEach(p => { if (p) scrollObs.observe(p); });
+
+// Fade dots out when edu section is visible
+const dotsEl = document.getElementById('step-dots');
+const eduObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    dotsEl.style.opacity = e.isIntersecting ? '0' : '1';
+    dotsEl.style.pointerEvents = e.isIntersecting ? 'none' : 'auto';
+  });
+}, { threshold: 0.15 });
+eduObs.observe(document.querySelector('.edu-panel'));
 
 // ── GENDER ──
 function selectGender(g) {
