@@ -646,35 +646,30 @@ footer strong { color: var(--white); }
           <div class="activity-name">Sedentary</div>
           <div class="activity-desc">Desk job, little to no exercise</div>
         </div>
-        <div class="activity-mult">×1.2</div>
       </div>
       <div class="activity-row" onclick="selectActivity(this,1.375)">
         <div class="activity-left">
           <div class="activity-name">Lightly Active</div>
           <div class="activity-desc">1–2 workouts per week</div>
         </div>
-        <div class="activity-mult">×1.375</div>
       </div>
       <div class="activity-row" onclick="selectActivity(this,1.55)">
         <div class="activity-left">
           <div class="activity-name">Moderately Active</div>
           <div class="activity-desc">3–5 workouts per week</div>
         </div>
-        <div class="activity-mult">×1.55</div>
       </div>
       <div class="activity-row" onclick="selectActivity(this,1.725)">
         <div class="activity-left">
           <div class="activity-name">Very Active</div>
           <div class="activity-desc">Hard training 6–7 days/week</div>
         </div>
-        <div class="activity-mult">×1.725</div>
       </div>
       <div class="activity-row" onclick="selectActivity(this,1.9)">
         <div class="activity-left">
           <div class="activity-name">Athlete</div>
           <div class="activity-desc">Twice-daily or physical job</div>
         </div>
-        <div class="activity-mult">×1.9</div>
       </div>
     </div>
 
@@ -1041,7 +1036,8 @@ const eduData = [
   { n:'04', title:'MAINTAINING', body:'Eating at TDEE keeps weight stable while unlocking <strong>body recomposition</strong> — losing fat and building muscle simultaneously. It\'s also the foundation for athletic performance. A <strong>well-fuelled maintenance phase</strong> is massively underrated. Your body is a long-term investment, not a short-term project.' },
   { n:'05', title:'BULKING', body:'A <strong>+250–500 calorie surplus</strong> above TDEE fuels lean muscle growth without excessive fat. Pair with progressive overload and <strong>1.6–2.2g protein per kg bodyweight</strong>. More food does not equal more muscle — the training stimulus is the trigger.' },
   { n:'06', title:'MACROS', body:'<strong>Protein (4 kcal/g)</strong> — builds muscle, highest satiety. <strong>Carbohydrates (4 kcal/g)</strong> — primary fuel for training and brain. <strong>Fat (9 kcal/g)</strong> — hormones, joints, vitamins A/D/E/K. The right ratio for your goal is shown in the macro targets above.' },
-  { n:'07', title:'ACCURACY', body:'No calculator is 100% precise. But <strong>Mifflin-St Jeor and Katch-McArdle</strong> are the most validated formulas available. Use your result as a starting point, track for 2–3 weeks, adjust by ±100–150 kcal based on real progress. <strong>The number is a compass, not a cage.</strong>' },
+  { n:'07', title:'ACTIVITY MULTIPLIERS', body:'When your BMR is calculated, it\'s multiplied by an <strong>activity factor</strong> to account for how much energy you burn through movement. <strong>Sedentary (×1.2)</strong> — desk job, minimal movement outside of it. <strong>Lightly Active (×1.375)</strong> — 1–2 workouts per week. <strong>Moderately Active (×1.55)</strong> — 3–5 sessions per week. <strong>Very Active (×1.725)</strong> — intense training most days. <strong>Athlete (×1.9)</strong> — twice-daily training or a physically demanding job. Most people underestimate their activity level — but also overestimate how much gym time offsets a sedentary job. Be honest for the most accurate result.' },
+  { n:'08', title:'ACCURACY', body:'No calculator is 100% precise. But <strong>Mifflin-St Jeor and Katch-McArdle</strong> are the most validated formulas available. Use your result as a starting point, track for 2–3 weeks, adjust by ±100–150 kcal based on real progress. <strong>The number is a compass, not a cage.</strong>' },
 ];
 
 const eduContainer = document.getElementById('edu-items');
