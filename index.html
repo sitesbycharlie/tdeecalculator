@@ -622,16 +622,14 @@ footer strong { color: var(--white); }
 .pop-anim { animation: pop 0.3s var(--ease); }
 
 .next-btn.ready {
-  animation: btn-pulse 2.4s ease-in-out infinite;
+  animation: btn-pulse 2.8s ease-in-out infinite;
 }
 @keyframes btn-pulse {
   0%,100% {
-    box-shadow: 0 4px 24px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.3);
-    transform: scale(1);
+    box-shadow: 0 4px 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.3);
   }
   50% {
-    box-shadow: 0 6px 48px var(--accent), 0 0 0 8px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.4);
-    transform: scale(1.012);
+    box-shadow: 0 4px 36px var(--accent-glow), 0 0 0 5px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.35);
   }
 }
 .share-section {
@@ -641,14 +639,16 @@ footer strong { color: var(--white); }
 }
 .share-inner { max-width: 520px; margin: 0 auto; text-align: center; }
 .share-label { font-size: 0.8rem; color: var(--gray3); font-weight: 600; margin-bottom: 1rem; letter-spacing: 0.05em; }
-.share-btns { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.share-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
 .share-btn {
-  padding: 0.55rem 1.1rem; font-size: 0.75rem; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.65rem 0.5rem; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
   border: 1px solid var(--gray2); border-radius: 100px;
   background: rgba(255,255,255,0.04); color: var(--gray3);
   text-decoration: none; cursor: pointer; font-family: var(--font-b);
   transition: all 0.2s var(--ease);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; white-space: nowrap;
 }
 .share-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
@@ -724,19 +724,111 @@ input[type=number] { -moz-appearance: textfield; }
 /* Edu accordion indicator */
 .edu-item-head { cursor: pointer; }
 .edu-toggle {
-  flex-shrink: 0;
-  width: 24px; height: 24px;
+  flex-shrink: 0; width: 24px; height: 24px;
   border: 1px solid var(--gray2); border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem; color: var(--gray3); line-height: 1;
-  transition: all 0.3s var(--ease);
+  transition: all 0.3s var(--ease), transform 0.3s var(--ease);
 }
-.edu-item-body.open ~ * .edu-toggle,
-.edu-item.open .edu-toggle {
-  background: var(--accent); border-color: var(--accent); color: #000;
-}
-/* Footer link hover */
+.edu-item.open .edu-toggle { background: var(--accent); border-color: var(--accent); color: #000; transform: rotate(45deg); }
 footer a:hover { color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
+
+/* START button — shimmer sweep on load */
+.hero-cta::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: conic-gradient(from 0deg, #4f9eff, #a78bfa, #ff5dac, #a78bfa, #4f9eff);
+  z-index: -2; filter: blur(10px);
+  transform: rotate(0deg);
+  transition: transform 1.5s ease-in-out;
+}
+.hero-cta:hover::before { transform: rotate(180deg); }
+.hero-cta::after {
+  content: ''; position: absolute; inset: 3px;
+  background: #000; border-radius: 47px; z-index: -1; filter: blur(3px);
+}
+
+/* Shimmer sweep across START on load */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(300%) skewX(-20deg); }
+}
+.hero-cta .shimmer {
+  position: absolute; inset: 0; z-index: 1; overflow: hidden; border-radius: 50px; pointer-events: none;
+}
+.hero-cta .shimmer::after {
+  content: '';
+  position: absolute; top: 0; left: 0; width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  animation: shimmer-sweep 2.5s 1s ease-in-out forwards;
+}
+
+/* NEXT / CALCULATE — ripple on tap */
+.next-btn { isolation: isolate; }
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transform: scale(0);
+  animation: ripple-out 0.55s ease-out forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes ripple-out {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* GENDER CARDS — spring on select */
+@keyframes card-spring {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  70% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+.gender-card.spring { animation: card-spring 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* ACTIVITY ROWS — left bar slides in smoothly */
+.activity-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); opacity: 0;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  border-radius: 3px 0 0 3px;
+  transform: scaleY(0);
+  transform-origin: center;
+}
+.activity-row.selected::before { opacity: 1; transform: scaleY(1); }
+
+/* GOAL CARDS — float + glow burst on select */
+@keyframes goal-select {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-6px) scale(1.04); }
+  65% { transform: translateY(-2px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+.goal-card.selecting { animation: goal-select 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* SHARE BUTTONS — fill sweep on hover */
+.share-btn {
+  position: relative; overflow: hidden;
+}
+.share-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--accent);
+  transform: translateX(-101%);
+  transition: transform 0.3s var(--ease);
+  z-index: -1;
+}
+.share-btn:hover::before { transform: translateX(0); }
+.share-btn:hover { color: #000; border-color: var(--accent); }
+
+/* EDU toggle — smooth rotate */
+.edu-toggle {
+  transition: all 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.edu-item.open .edu-toggle { transform: rotate(45deg); }
 </style>
 
 <script type="application/ld+json">
@@ -865,6 +957,7 @@ footer a:hover { color: var(--accent) !important; border-bottom-color: var(--acc
   <p class="hero-sub">Find your Total Daily Energy Expenditure in 60 seconds. Science-backed numbers, exact macros, and zero fluff.</p>
   <button class="hero-cta" onclick="scrollToPanel(1)">
     <span class="hero-cta-text">START ↓</span>
+    <span class="shimmer"></span>
   </button>
 </section>
 
@@ -1373,6 +1466,7 @@ function calculate() {
 // ── GOAL ──
 function selectGoal(g, evt) {
   S.goal = g;
+  addGoalSelectAnim(g);
   document.querySelectorAll('.goal-card').forEach(c=>c.className='goal-card');
   const map = { cut:'active-cut', maintain:'active-maintain', bulk:'active-bulk' };
   document.getElementById('goal-'+g).classList.add(map[g]);
@@ -1498,6 +1592,29 @@ function toggleEdu(i, headEl) {
   }
 }
 
+
+// ── RIPPLE on NEXT/CALCULATE buttons ──
+document.querySelectorAll('.next-btn').forEach(btn => {
+  btn.addEventListener('pointerdown', function(e) {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
+    this.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+});
+
+// ── GOAL BURST animation ──
+function addGoalSelectAnim(g) {
+  const el = document.getElementById('goal-' + g);
+  if (!el) return;
+  el.classList.remove('selecting');
+  void el.offsetWidth;
+  el.classList.add('selecting');
+  setTimeout(() => el.classList.remove('selecting'), 500);
+}
 
 function animNum(id, target) {
   const el = document.getElementById(id);
