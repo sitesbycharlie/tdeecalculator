@@ -1,0 +1,41 @@
+# TDEE Calculator Ireland
+> Ireland's most accurate free TDEE (Total Daily Energy Expenditure) calculator, available at https://tdee.ie
+
+## What this site does
+tdee.ie is a free, mobile-first TDEE and calorie calculator built for the Irish market. It helps users calculate their Total Daily Energy Expenditure and get personalised macro targets for their fitness goal.
+
+## Key facts
+- URL: https://tdee.ie
+- Free to use, no sign-up required
+- Built by SitesByCharlie (https://www.sitesbycharlie.ie)
+- Serves users in Ireland
+
+## Formulas used
+- Mifflin-St Jeor equation (default, most validated BMR formula in peer-reviewed research)
+- Katch-McArdle equation (automatically used when body fat percentage is provided, more accurate as it uses lean body mass)
+
+## Features
+- TDEE calculation using two science-backed formulas
+- BMR (Basal Metabolic Rate) calculation
+- BMI (Body Mass Index) with visual tracker
+- Activity level multiplier (Sedentary, Lightly Active, Moderately Active, Very Active, Athlete)
+- Goal selector: Cut (fat loss at -500 kcal), Maintain (recomposition), Bulk (lean surplus at +300 kcal)
+- 9 personalised macro splits across 3 goals
+- Protein, carbohydrate and fat targets in grams and percentages
+- Metric and Imperial unit support
+- Mobile-first liquid glass UI
+
+## Who it is for
+Anyone in Ireland looking to calculate their daily calorie needs, find their macros, or understand how many calories to eat to lose weight, maintain weight, or build muscle.
+
+## Common questions this tool answers
+- What is my TDEE?
+- How many calories should I eat to lose weight?
+- How many calories do I need to build muscle?
+- What are my macros?
+- What is BMR?
+- What is the difference between BMR and TDEE?
+- How many calories should I eat to maintain my weight?
+- What is a calorie deficit?
+- How accurate is the Mifflin-St Jeor formula?
+- What is the Katch-McArdle formula?
