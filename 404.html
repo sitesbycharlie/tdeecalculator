@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found · TDEE Calculator Ireland</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="tdee-logo.svg">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #000; color: #f0f0f0;
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(79,158,255,0.08) 0%, transparent 70%);
+  }
+  .num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(7rem, 30vw, 14rem);
+    line-height: 1;
+    background: linear-gradient(90deg, #4f9eff, #ff5dac);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: 0.02em;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(1.8rem, 8vw, 3rem);
+    letter-spacing: 0.05em; margin: 0.5rem 0 1rem;
+    color: #f0f0f0;
+  }
+  p { font-size: 0.9rem; color: #777; line-height: 1.7; max-width: 340px; margin-bottom: 2.5rem; }
+  a {
+    display: inline-block;
+    padding: 0.9rem 2rem;
+    background: linear-gradient(90deg, #4f9eff, #ff5dac);
+    color: #000; font-weight: 700; font-size: 0.9rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border-radius: 100px; text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  a:hover { opacity: 0.9; transform: scale(1.02); }
+</style>
+</head>
+<body>
+  <div class="num">404</div>
+  <h1>PAGE NOT FOUND</h1>
+  <p>Looks like this page doesn't exist. Head back and calculate your TDEE.</p>
+  <a href="index.html">Back to Calculator</a>
+</body>
+</html>
