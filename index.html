@@ -675,6 +675,7 @@ footer strong { color: var(--white); }
 .static-fb-sub {
   font-size: 0.68rem; color: var(--gray3);
   font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  transition: opacity 0.35s ease;
 }
 .static-fb-ty {
   display: none;
@@ -1828,9 +1829,17 @@ async function sendFeedback(response) {
   const btns = document.getElementById('static-fb-btns');
   const ty = document.getElementById('static-fb-ty');
 
-  // Fade buttons out
+  // Fade buttons and sub text out together
+  const sub = document.querySelector('.static-fb-sub');
   btns.style.transition = 'opacity 0.35s ease';
   btns.style.opacity = '0';
+  if (sub) {
+    sub.style.transition = 'opacity 0.35s ease';
+    sub.style.opacity = '0';
+  }
+  setTimeout(() => {
+    if (sub) sub.style.visibility = 'hidden';
+  }, 400);
 
   setTimeout(() => {
     btns.style.display = 'none';
